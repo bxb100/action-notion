@@ -1,0 +1,43 @@
+name: 'Notion Create Page'
+description: 'Create a Notion database page with custom columns, using local text or a file as the page content.'
+author: 'you'
+branding:
+  icon: 'file-text'
+  color: 'gray'
+
+inputs:
+  notion_token:
+    description: 'Notion integration token (use a secret). The integration must be shared with the database.'
+    required: true
+  database_id:
+    description: 'Target database ID.'
+    required: true
+  title:
+    description: 'Optional shortcut: value for the database title column (auto-detected).'
+    required: false
+  properties:
+    description: >
+      JSON object mapping column name -> value. Types are auto-converted from the database schema.
+      e.g. {"Status":"Done","Tags":"ci,release","Score":3,"Date":"2026-10-27","Done":true}
+    required: false
+    default: '{}'
+  content:
+    description: 'Text used as the page body.'
+    required: false
+  content_file:
+    description: 'Path to a local file used as the page body (used if `content` is empty).'
+    required: false
+  content_format:
+    description: '`markdown` (headings/lists/code/quote/todo/divider) or `plain` (paragraphs split by blank lines).'
+    required: false
+    default: 'markdown'
+
+outputs:
+  page_id:
+    description: 'ID of the created page.'
+  page_url:
+    description: 'URL of the created page.'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

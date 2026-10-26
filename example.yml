@@ -1,0 +1,37 @@
+name: Push release notes to Notion
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  notion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write release notes to a local file
+        run: |
+          {
+            echo "# ${{ github.event.release.name || github.ref_name }}"
+            echo
+            echo "- Repo: ${{ github.repository }}"
+            echo "- Commit: ${{ github.sha }}"
+          } > notes.md
+
+      - id: notion
+        uses: ./
+        with:
+          notion_token: ${{ secrets.NOTION_TOKEN }}
+          database_id: ${{ secrets.NOTION_DATABASE_ID }}
+          title: ${{ github.event.release.name || github.ref_name }}
+          properties: |
+            {
+              "Status": "Done",
+              "Repo": "${{ github.repository }}",
+              "Date": "${{ github.event.release.published_at || '2026-01-01' }}"
+            }
+          content_file: notes.md
+
+      - run: echo "Created ${{ steps.notion.outputs.page_url }}"
